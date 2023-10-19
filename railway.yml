@@ -1,0 +1,8 @@
+services:
+  - name: oursos-backend
+    image: railwayapp/golang
+    env:
+      - key: PORT
+        value: 3000
+    buildCommand: go build -o out
+    runCommand: ./out
