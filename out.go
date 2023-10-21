@@ -44,6 +44,7 @@ func main() {
 	e.GET("/news", api.GetNews)
 	e.GET("/languages", api.ListSupportedLanguages)
 	e.GET("/languagelistenglish", api.ListLanguagesEnglish)
+	e.POST("/translateobject", api.TranslateObject)
 
 	e.Logger.Fatal(e.Start("0.0.0.0:" + os.Getenv("PORT")))
 }
