@@ -65,10 +65,8 @@ func TranslateObject(c echo.Context) error {
 func changeValueForKey(data map[string]interface{}, keyToChange, newValue string) {
 	for key, value := range data {
 		if subMap, ok := value.(map[string]interface{}); ok {
-			// If the value is a map (object), recursively change the value
 			changeValueForKey(subMap, keyToChange, newValue)
 		} else if key == keyToChange {
-			// If the key matches the key to change, update the value
 			data[key] = newValue
 		}
 	}

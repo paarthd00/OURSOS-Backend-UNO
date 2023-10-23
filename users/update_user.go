@@ -20,7 +20,7 @@ func UpdateUser(c echo.Context) error {
 	json_map := make(map[string]interface{})
 	errEnc := json.NewDecoder(c.Request().Body).Decode(&json_map)
 	util.CheckError(errEnc)
-
+	
 	username := json_map["username"]
 	locations := json_map["locations"].([]interface{})
 	languagepreference := json_map["languagepreference"]
