@@ -37,28 +37,28 @@ func TranslateObject(c echo.Context) error {
 	lang := json_map["lang"].(string)
 	targetLang := language.MustParse(lang).String()
 	var wg sync.WaitGroup // WaitGroup to synchronize goroutines
-
 	var mutex sync.Mutex
-	for _, value := range inputObject {
-
-		if subMap, ok := value.(map[string](interface{})); ok {
-			for subKey, subValue := range subMap {
-				wg.Add(1)
-				go func(subKey string, subValue interface{}) {
-					defer wg.Done() // Decrement the WaitGroup when the goroutine completes
-					mutex.Lock()
+	for key, value := range inputObject {
+		if subMap, ok := value.(map[string]interface{}); ok {
+			wg.Add(1)
+			go func(subMap map[string]interface{}, key string) {
+				defer wg.Done() // Decrement the WaitGroup when the goroutine completes
+				mutex.Lock()
+				newSubMap := make(map[string]interface{})
+				for subKey, subValue := range subMap {
 					resp, err := client.Translate(ctx, []string{subValue.(string)}, language.Make(targetLang), nil)
 					util.CheckError(err)
 
 					translatedText := resp[0].Text
-					changeValueForKey(inputObject, subKey, translatedText)
-					mutex.Unlock()
-				}(subKey, subValue)
-			}
+					newSubMap[subKey] = translatedText
+				}
+				inputObject[key] = newSubMap
+				mutex.Unlock()
+			}(subMap, key)
 		}
-
 	}
 	wg.Wait()
+
 	return c.JSON(200, inputObject)
 }
 
