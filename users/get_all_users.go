@@ -17,8 +17,8 @@ import (
 type User struct {
 	ID                 int     `json:"id"`
 	Username           string  `json:"username"`
-	Longitude          float64 `json:"longitude"`
 	Latitude           float64 `json:"latitude"`
+	Longitude          float64 `json:"longitude"`
 	LanguagePreference string  `json:"languagepreference"`
 	Friends            []int   `json:"friends"`
 	Profile            string  `json:"profile"`
@@ -29,7 +29,7 @@ func GetAllUsersHandler(c echo.Context) error {
 	db, err := db.Connection()
 	util.CheckError(err)
 
-	rows, err := db.Query("SELECT id, username, longitude, latitude, languagepreference, friends FROM users")
+	rows, err := db.Query("SELECT id, username, latitude, longitude, languagepreference, friends, profile FROM users")
 	if err != nil {
 		log.Fatal(err)
 		return c.String(http.StatusInternalServerError, "Database error")
@@ -41,7 +41,7 @@ func GetAllUsersHandler(c echo.Context) error {
 	for rows.Next() {
 		var user User
 		var friendsStr string // To hold the array as a string
-		err := rows.Scan(&user.ID, &user.Username, &user.Longitude, &user.Latitude, &user.LanguagePreference, &friendsStr, &user.Profile)
+		err := rows.Scan(&user.ID, &user.Username, &user.Latitude, &user.Longitude, &user.LanguagePreference, &friendsStr, &user.Profile)
 		if err != nil {
 			log.Fatal(err)
 			return c.String(http.StatusInternalServerError, "Database error")
