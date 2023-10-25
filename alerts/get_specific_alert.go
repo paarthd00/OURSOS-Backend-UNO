@@ -29,7 +29,7 @@ func GetAlertById(c echo.Context) error {
 
 	var alert Alert
 
-	err = rows.Scan(&alert.ID, &alert.Message, &alert.Latitude, &alert.Longitude, &alert.Radius)
+	err = rows.Scan(&alert.ID, &alert.Message, &alert.Category, &alert.Severity, &alert.Time, &alert.Latitude, &alert.Longitude, &alert.Radius)
 
 	util.CheckError(err)
 

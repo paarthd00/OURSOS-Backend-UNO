@@ -10,7 +10,6 @@ import (
 	"oursos.com/packages/db"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"oursos.com/packages/util"
 )
@@ -35,7 +34,7 @@ func GetUserById(c echo.Context) error {
 
 	var user User
 	var friendsStr string
-	errScan := rows.Scan(&user.ID, &user.Username, pq.Array(&user.Locations), &user.LanguagePreference, &friendsStr)
+	errScan := rows.Scan(&user.ID, &user.Username, &user.Longitude, &user.Latitude, &user.LanguagePreference, &friendsStr, &user.Profile)
 	util.CheckError(errScan)
 
 	// Parse the "friends" array from the string to []int

@@ -12,14 +12,14 @@ import (
 )
 
 type Alert struct {
-	ID        int    `json:"id"`
-	Message   string `json:"message"`
-	Category  string `json:"category"`
-	Severity  string `json:"severity"`
-	Time      string `json:"time"`
-	Latitude  string `json:"latitude"`
-	Longitude string `json:"longitude"`
-	Radius    string `json:"radius"`
+	ID        int     `json:"id"`
+	Message   string  `json:"message"`
+	Category  string  `json:"category"`
+	Severity  string  `json:"severity"`
+	Time      string  `json:"time"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Radius    float64 `json:"radius"`
 }
 
 func GetAllAlertsHandler(c echo.Context) error {

@@ -22,7 +22,8 @@ func UpdateUser(c echo.Context) error {
 	util.CheckError(errEnc)
 	
 	username := json_map["username"]
-	locations := json_map["locations"].([]interface{})
+	longitude := json_map["longitude"]
+	latitude := json_map["latitude"]
 	languagepreference := json_map["languagepreference"]
 	friends := json_map["friends"].([]interface{})
 
@@ -30,7 +31,7 @@ func UpdateUser(c echo.Context) error {
 	util.CheckError(err)
 	defer stmt.Close()
 
-	_, err = stmt.Exec(id, username, pq.Array(locations), languagepreference.(string), pq.Array(friends))
+	_, err = stmt.Exec(id, username, longitude, latitude, languagepreference.(string), pq.Array(friends))
 	util.CheckError(err)
 
 	return c.JSON(200, map[string]string{"message": "User updated successfully"})

@@ -50,11 +50,11 @@ func ListSupportedLanguages(c echo.Context) error {
 			defer wg.Done() // Decrement the WaitGroup when the goroutine completes
 
 			transName := TranslateText(lang.Name, lang.Tag.String())
-			transtag := TranslateText(lang.Tag.String(), lang.Tag.String())
+			// transtag := TranslateText(lang.Tag.String(), lang.Tag.String())
 
 			// Safely append results to the languages slice
 			mutex.Lock()
-			languages = append(languages, LanguagePreference{Name: transName, Tag: transtag})
+			languages = append(languages, LanguagePreference{Name: transName, Tag: lang.Tag.String()})
 			mutex.Unlock()
 		}(lang)
 	}
