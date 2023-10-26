@@ -42,7 +42,7 @@ func GetForestFireData(c echo.Context) error {
 	util.CheckError(err)
 	currentTime := time.Now().UTC()
 
-	todaysDate := currentTime.Format("2006-01-02")
+	todaysDate := currentTime.AddDate(0, 0, -1).Format("2006-01-02")
 	key := os.Getenv("NASA_FIRE_KEY")
 	apiURL := "https://firms.modaps.eosdis.nasa.gov/api/country/csv/" + key + "/VIIRS_SNPP_NRT/CAN/1/" + todaysDate
 	response, err := http.Get(apiURL)
