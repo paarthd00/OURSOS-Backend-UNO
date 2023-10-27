@@ -11,7 +11,6 @@ import (
 	_ "github.com/lib/pq"
 	"oursos.com/packages/alerts"
 	"oursos.com/packages/api"
-	"oursos.com/packages/db"
 	"oursos.com/packages/users"
 	"oursos.com/packages/util"
 )
@@ -21,7 +20,7 @@ func homeHandler(c echo.Context) error {
 }
 
 func main() {
-	go db.SeedDatabase()
+	// go db.SeedDatabase()
 	err := godotenv.Load()
 	util.CheckError(err)
 	e := echo.New()
