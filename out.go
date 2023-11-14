@@ -20,7 +20,6 @@ func homeHandler(c echo.Context) error {
 }
 
 func main() {
-	// go db.SeedDatabase()
 	err := godotenv.Load()
 	util.CheckError(err)
 	e := echo.New()
