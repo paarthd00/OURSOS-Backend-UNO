@@ -9,6 +9,7 @@ require (
 	github.com/labstack/echo/v4 v4.11.2
 	github.com/lib/pq v1.10.9
 	github.com/pusher/pusher-http-go/v5 v5.1.1
+	github.com/redis/go-redis/v9 v9.3.0
 	github.com/serpapi/google-search-results-golang v0.0.0-20230616000151-95707d993dc6
 	golang.org/x/text v0.13.0
 )
@@ -29,7 +30,6 @@ require (
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
-	github.com/redis/go-redis/v9 v9.3.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	go.opencensus.io v0.24.0 // indirect
