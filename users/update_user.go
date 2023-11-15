@@ -16,11 +16,10 @@ func UpdateUser(c echo.Context) error {
 	defer dbConn.Close()
 
 	id := c.Param("id")
-	// mo := c.Param("mo")
 	json_map := make(map[string]interface{})
 	errEnc := json.NewDecoder(c.Request().Body).Decode(&json_map)
 	util.CheckError(errEnc)
-	
+
 	username := json_map["username"]
 	longitude := json_map["longitude"]
 	latitude := json_map["latitude"]

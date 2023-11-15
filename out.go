@@ -36,10 +36,12 @@ func main() {
 	e.PUT("/updateuser/:id", users.UpdateUser)
 	e.GET("/alerts", alerts.GetAllAlertsHandler)
 	e.GET("/alerts/:id", alerts.GetAlertById)
+	e.POST("/reportalert", alerts.ReportAlert)
 	e.GET("/aispeech", api.Speech)
 	e.GET("/fires", api.GetForestFireData)
 	e.GET("/earthquakes", api.GetEarthQuakes)
 	e.POST("/translate", api.Translate)
+
 	e.GET("/news", api.GetNews)
 	e.GET("/languages", api.ListSupportedLanguages)
 	e.POST("/translateobject", api.TranslateObject)
