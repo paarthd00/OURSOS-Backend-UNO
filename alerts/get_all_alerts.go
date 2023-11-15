@@ -28,19 +28,10 @@ func GetAllAlertsHandler(c echo.Context) error {
 	rows, err := db.Query("SELECT * FROM alerts")
 	util.CheckError(err)
 	defer rows.Close()
-	// client := redis.Client()
-	// ctx := context.Background()
 
-	// exists, err := client.Exists(ctx, "alerts").Result()
 	util.CheckError(err)
 	var alerts []Alert
 
-	// if exists == 1 {
-	// 	alerts_json := client.Get(ctx, "alerts").Val()
-	// 	err = json.Unmarshal([]byte(alerts_json), &alerts)
-	// 	util.CheckError(err)
-	// 	println("redis")
-	// } else {
 	for rows.Next() {
 		var alert Alert
 		if err := rows.Scan(&alert.ID, &alert.Message, &alert.Category, &alert.Severity, &alert.Time, &alert.Latitude, &alert.Longitude, &alert.Radius); err != nil {
@@ -48,11 +39,5 @@ func GetAllAlertsHandler(c echo.Context) error {
 		}
 		alerts = append(alerts, alert)
 	}
-	// alerts_json, err := json.Marshal(alerts)
-	// util.CheckError(err)
-	// rediserr := client.Set(ctx, "alerts", alerts_json, 0).Err()
-	// util.CheckError(rediserr)
-	// }
-
 	return c.JSON(http.StatusOK, alerts)
 }
