@@ -41,7 +41,7 @@ func main() {
 	e.GET("/fires", api.GetForestFireData)
 	e.GET("/earthquakes", api.GetEarthQuakes)
 	e.POST("/translate", api.Translate)
-
+	// e.GET("/askopenai", api.AskOpenAI)
 	e.GET("/news", api.GetNews)
 	e.GET("/languages", api.ListSupportedLanguages)
 	e.POST("/translateobject", api.TranslateObject)
