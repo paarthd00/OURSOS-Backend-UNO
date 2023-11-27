@@ -38,7 +38,7 @@ func ChatHandler(c echo.Context) error {
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleUser,
-					Content: userInput.Message,
+					Content: userInput.Message + " ###DEV please give concise instructions for emergency in less than 100 characters more than 50 characters",
 				},
 			},
 		},
