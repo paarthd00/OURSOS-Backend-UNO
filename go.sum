@@ -85,6 +85,8 @@ github.com/pusher/pusher-http-go/v5 v5.1.1 h1:ZLUGdLA8yXMvByafIkS47nvuXOHrYmlh4b
 github.com/pusher/pusher-http-go/v5 v5.1.1/go.mod h1:Ibji4SGoUDtOy7CVRhCiEpgy+n5Xv6hSL/QqYOhmWW8=
 github.com/redis/go-redis/v9 v9.3.0 h1:RiVDjmig62jIWp7Kk4XVLs0hzV6pI3PyTnnL0cnn0u0=
 github.com/redis/go-redis/v9 v9.3.0/go.mod h1:hdY0cQFCN4fnSYT6TkisLufl/4W5UIXyv0b/CLO2V2M=
+github.com/sashabaranov/go-openai v1.17.8 h1:snuE7l0XQ1KAmkY/cODAEgxu2fl+g/ybXK6cKQzli/E=
+github.com/sashabaranov/go-openai v1.17.8/go.mod h1:lj5b/K+zjTSFxVLijLSTDZuP7adOgerWeFyZLUhAKRg=
 github.com/serpapi/google-search-results-golang v0.0.0-20230616000151-95707d993dc6 h1:Zn5ptU8qDWLN0kv4zxouKF0Sj0ty6YrB9a1u7suC1c4=
 github.com/serpapi/google-search-results-golang v0.0.0-20230616000151-95707d993dc6/go.mod h1:B4KcaaGbSpn3vq3FxSCsEJrBirStags89KTusB2of58=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

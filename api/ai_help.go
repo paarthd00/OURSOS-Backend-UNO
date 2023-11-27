@@ -1,34 +1,53 @@
 package api
 
-// import (
-// 	"bytes"
-// 	"encoding/json"
-// 	"fmt"
-// 	"net/http"
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"os"
 
-// 	"github.com/labstack/echo/v4"
-// 	"oursos.com/packages/util"
-// )
+	"github.com/joho/godotenv"
+	"github.com/labstack/echo/v4"
+	"github.com/sashabaranov/go-openai"
+	"oursos.com/packages/util"
+)
 
-// func AskOpenAI(c echo.Context) error {
-// 	url := "https://api.openai.com/v1/engines/davinci-codex/completions"
-// 	var jsonStr = []byte(`{"prompt":"` + "I have a fire near me" + `", "max_tokens": 60}`)
-// 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+type ChatRequest struct {
+	Message string `json:"message"`
+}
 
-// 	util.CheckError(err)
-// 	req.Header.Set("Content-Type", "application/json")
-// 	req.Header.Set("Authorization", "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")
+func ChatHandler(c echo.Context) error {
+	err := godotenv.Load()
+	util.CheckError(err)
 
-// 	client := &http.Client{}
-// 	resp, err := client.Do(req)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer resp.Body.Close()
+	var userInput ChatRequest
 
-// 	var bodyJSON interface{}
-// 	json.NewDecoder(resp.Body).Decode(&bodyJSON)
-// 	fmt.Println("response Body:", bodyJSON)
+	user_input_err := json.NewDecoder(c.Request().Body).Decode(&userInput)
+	if user_input_err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"error": "Invalid request body",
+		})
+	}
 
-// 	return c.JSON(http.StatusOK, bodyJSON)
-// }
+	client := openai.NewClient(os.Getenv("OPEN_AI"))
+	resp, err := client.CreateChatCompletion(
+		context.Background(),
+		openai.ChatCompletionRequest{
+			Model: openai.GPT3Dot5Turbo,
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role:    openai.ChatMessageRoleUser,
+					Content: userInput.Message,
+				},
+			},
+		},
+	)
+
+	if err != nil {
+		fmt.Printf("ChatCompletion error: %v\n", err)
+		return err
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{"response": resp.Choices[0].Message.Content})
+}
