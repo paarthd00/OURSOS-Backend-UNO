@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -10,6 +11,8 @@ import (
 	"cloud.google.com/go/translate"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/text/language"
+	"oursos.com/packages/redis"
+	"oursos.com/packages/util"
 )
 
 type LanguagePreference struct {
@@ -40,26 +43,41 @@ func ListSupportedLanguages(c echo.Context) error {
 	}
 	var languages []LanguagePreference
 
-	var wg sync.WaitGroup // WaitGroup to synchronize goroutines
+	redis_client := redis.Client()
+	redis_ctx := context.Background()
 
-	var mutex sync.Mutex // Mutex to protect the languages slice
+	exists, err := redis_client.Exists(redis_ctx, "languages").Result()
+	util.CheckError(err)
+	if exists == 1 {
+		languages_json := redis_client.Get(redis_ctx, "languages").Val()
+		err = json.Unmarshal([]byte(languages_json), &languages)
+		util.CheckError(err)
+		println("redis")
 
-	for _, lang := range langs {
-		wg.Add(1) // Increment the WaitGroup for each goroutine
-		go func(lang translate.Language) {
-			defer wg.Done() // Decrement the WaitGroup when the goroutine completes
+	} else {
+		var wg sync.WaitGroup // WaitGroup to synchronize goroutines
 
-			transName := TranslateText(lang.Name, lang.Tag.String())
-			// transtag := TranslateText(lang.Tag.String(), lang.Tag.String())
+		var mutex sync.Mutex // Mutex to protect the languages slice
 
-			// Safely append results to the languages slice
-			mutex.Lock()
-			languages = append(languages, LanguagePreference{Name: transName, Tag: lang.Tag.String()})
-			mutex.Unlock()
-		}(lang)
+		for _, lang := range langs {
+			wg.Add(1) // Increment the WaitGroup for each goroutine
+			go func(lang translate.Language) {
+				defer wg.Done() // Decrement the WaitGroup when the goroutine completes
+
+				transName := TranslateText(lang.Name, lang.Tag.String())
+				// transtag := TranslateText(lang.Tag.String(), lang.Tag.String())
+
+				// Safely append results to the languages slice
+				mutex.Lock()
+				languages = append(languages, LanguagePreference{Name: transName, Tag: lang.Tag.String()})
+				mutex.Unlock()
+			}(lang)
+		}
+		wg.Wait()
+		languages_json, err := json.Marshal(languages)
+		util.CheckError(err)
+		rediserr := redis_client.Set(ctx, "languages", languages_json, 0).Err()
+		util.CheckError(rediserr)
 	}
-
-	wg.Wait()
-
 	return c.JSON(http.StatusOK, languages)
 }
