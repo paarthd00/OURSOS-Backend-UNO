@@ -76,7 +76,7 @@ func ListSupportedLanguages(c echo.Context) error {
 		wg.Wait()
 		languages_json, err := json.Marshal(languages)
 		util.CheckError(err)
-		rediserr := redis_client.Set(ctx, "languages", languages_json, 0).Err()
+		rediserr := redis_client.Set(redis_ctx, "languages", languages_json, 0).Err()
 		util.CheckError(rediserr)
 	}
 	return c.JSON(http.StatusOK, languages)
