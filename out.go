@@ -9,8 +9,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
+	"gopkg.in/robfig/cron.v2"
 	"oursos.com/packages/alerts"
 	"oursos.com/packages/api"
+	"oursos.com/packages/db"
 	"oursos.com/packages/users"
 	"oursos.com/packages/util"
 )
@@ -20,8 +22,10 @@ func homeHandler(c echo.Context) error {
 }
 
 func main() {
+
 	err := godotenv.Load()
 	util.CheckError(err)
+	dbConn, err := db.Connection()
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"}, // Allow all origins.
@@ -29,6 +33,14 @@ func main() {
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
 
+	c := cron.New()
+	c.AddFunc("@every 1h", func() {
+		cleanAlertSQL := `DELETE FROM alerts WHERE time <= NOW() - INTERVAL '1 hour';`
+		_, err = dbConn.Exec(cleanAlertSQL)
+		util.CheckError(err)
+	})
+
+	c.Start()
 	// db.SeedDatabase()
 	e.GET("/", homeHandler)
 	e.GET("/users", users.GetAllUsersHandler)
