@@ -34,8 +34,8 @@ func main() {
 	}))
 
 	c := cron.New()
-	c.AddFunc("@every 1h", func() {
-		cleanAlertSQL := `DELETE FROM alerts WHERE time <= NOW() - INTERVAL '1 hour';`
+	c.AddFunc("@every 1m", func() {
+		cleanAlertSQL := `DELETE FROM alerts WHERE time <= NOW() - INTERVAL '1 minute';`
 		_, err = dbConn.Exec(cleanAlertSQL)
 		util.CheckError(err)
 	})
