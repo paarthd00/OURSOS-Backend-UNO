@@ -19,10 +19,10 @@ func ReportAlert(c echo.Context) error {
 	util.CheckError(err)
 
 	insertAlertSQL := `
-        INSERT INTO alerts (message, category, severity, latitude, longitude)
+        INSERT INTO alerts (message, type, severity, lat, long)
         VALUES ($1, $2, $3, $4, $5)
     `
-	_, err = dbConn.Exec(insertAlertSQL, alert.Message, alert.Category, alert.Severity, alert.Latitude, alert.Longitude)
+	_, err = dbConn.Exec(insertAlertSQL, alert.Message, alert.Type, alert.Severity, alert.Lat, alert.Long)
 
 	util.CheckError(err)
 	return c.JSON(200, map[string]string{"message": "Alert created successfully"})
