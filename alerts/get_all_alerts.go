@@ -15,11 +15,10 @@ type Alert struct {
 	ID        int     `json:"id"`
 	Message   string  `json:"message"`
 	Category  string  `json:"category"`
-	Severity  string  `json:"severity"`
+	Severity  int8    `json:"severity"`
 	Time      string  `json:"time"`
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
-	Radius    float64 `json:"radius"`
 }
 
 func GetAllAlertsHandler(c echo.Context) error {
@@ -43,7 +42,7 @@ func GetAllAlertsHandler(c echo.Context) error {
 	// } else {
 	for rows.Next() {
 		var alert Alert
-		if err := rows.Scan(&alert.ID, &alert.Message, &alert.Category, &alert.Severity, &alert.Time, &alert.Latitude, &alert.Longitude, &alert.Radius); err != nil {
+		if err := rows.Scan(&alert.ID, &alert.Message, &alert.Category, &alert.Severity, &alert.Time, &alert.Latitude, &alert.Longitude); err != nil {
 			util.CheckError(err)
 		}
 		alerts = append(alerts, alert)

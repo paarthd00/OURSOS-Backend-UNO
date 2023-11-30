@@ -29,6 +29,7 @@ func main() {
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
 
+	// db.SeedDatabase()
 	e.GET("/", homeHandler)
 	e.GET("/users", users.GetAllUsersHandler)
 	e.GET("/users/:id", users.GetUserById)

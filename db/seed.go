@@ -31,11 +31,10 @@ func SeedDatabase() {
             id SERIAL PRIMARY KEY,
             message TEXT,
             category VARCHAR(50),
-            severity VARCHAR(50),
+            severity int8,
             time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             latitude FLOAT NOT NULL,
-            longitude FLOAT NOT NULL,
-            radius FLOAT
+            longitude FLOAT NOT NULL
         );
     `
 	_, err = db.Exec(createTables)
@@ -48,9 +47,9 @@ func SeedDatabase() {
 	util.CheckError(err)
 
 	insertAlertSQL := `
-        INSERT INTO alerts (message, category, severity, latitude, longitude, radius)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO alerts (message, category, severity, latitude, longitude)
+        VALUES ($1, $2, $3, $4, $5)
     `
-	_, err = db.Exec(insertAlertSQL, "Emergency Alert", "Traffic Update", "low", 49.2827, -123.1207, 5.0)
+	_, err = db.Exec(insertAlertSQL, "Emergency Alert", "Traffic Update", 0, 49.2827, -123.1207)
 	util.CheckError(err)
 }
