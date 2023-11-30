@@ -11,7 +11,6 @@ import (
 	_ "github.com/lib/pq"
 	"oursos.com/packages/alerts"
 	"oursos.com/packages/api"
-	"oursos.com/packages/db"
 	"oursos.com/packages/users"
 	"oursos.com/packages/util"
 )
@@ -30,7 +29,7 @@ func main() {
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
 
-	db.SeedDatabase()
+	// db.SeedDatabase()
 	e.GET("/", homeHandler)
 	e.GET("/users", users.GetAllUsersHandler)
 	e.GET("/users/:id", users.GetUserById)
