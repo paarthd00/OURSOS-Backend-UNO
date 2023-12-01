@@ -44,7 +44,7 @@ func main() {
 	// db.SeedDatabase()
 	e.GET("/", homeHandler)
 	e.GET("/users", users.GetAllUsersHandler)
-	e.GET("/users/:id", users.GetUserById)
+	e.GET("/users/:deviceId", users.GetUserById)
 	e.DELETE("/deleteuser/:id", users.DeleteUser)
 	e.PUT("/updateuser/:id", users.UpdateUser)
 	e.GET("/alerts", alerts.GetAllAlertsHandler)
