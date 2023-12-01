@@ -8,6 +8,7 @@ import (
 
 func SeedDatabase() {
 	db, err := Connection()
+	deviceId := "efe49b2f-4380-4c71-a969-d230f6c3199b"
 	username := "JohnDoe"
 	lat := 49.263570
 	long := -123.138570
@@ -19,6 +20,7 @@ func SeedDatabase() {
 	createTables := `
         CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,
+		deviceId VARCHAR(255) NOT NULL,
             username VARCHAR(255) NOT NULL,
             lat FLOAT NOT NULL,
             long FLOAT NOT NULL,  
@@ -41,9 +43,9 @@ func SeedDatabase() {
 	util.CheckError(err)
 
 	_, err = db.Exec(`
-        INSERT INTO users (username, lat, long, languagepreference, friends, profile)
-        VALUES ($1, $2, $3, $4, $5, $6)
-    `, username, lat, long, languagepreference, pq.Array(friends), profile)
+        INSERT INTO users (deviceId,username, lat, long, languagepreference, friends, profile)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `, deviceId, username, lat, long, languagepreference, pq.Array(friends), profile)
 	util.CheckError(err)
 
 	insertAlertSQL := `

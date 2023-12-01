@@ -18,6 +18,7 @@ func CreateUser(c echo.Context) error {
 	errEnc := json.NewDecoder(c.Request().Body).Decode(&json_map)
 	util.CheckError(errEnc)
 
+	deviceId := json_map["deviceId"]
 	username := json_map["username"]
 	lat := json_map["lat"]
 	long := json_map["lang"]
@@ -25,11 +26,11 @@ func CreateUser(c echo.Context) error {
 	friends := json_map["friends"]
 
 	// Create a prepared statement
-	stmt, err := dbConn.Prepare("INSERT INTO users (username, lat, long, languagepreference, friends) VALUES (?, ?, ?, ?)")
+	stmt, err := dbConn.Prepare("INSERT INTO users (deviceId, username, lat, long, languagepreference, friends) VALUES (?, ?, ?, ?)")
 	util.CheckError(err)
 	defer stmt.Close()
 
-	_, err = stmt.Exec(username, lat, long, languagepreference, friends)
+	_, err = stmt.Exec(deviceId, username, lat, long, languagepreference, friends)
 	util.CheckError(err)
 
 	return c.JSON(200, map[string]string{"message": "User created successfully"})

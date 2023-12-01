@@ -41,7 +41,7 @@ func main() {
 	})
 
 	c.Start()
-	// db.SeedDatabase()
+	db.SeedDatabase()
 	e.GET("/", homeHandler)
 	e.GET("/users", users.GetAllUsersHandler)
 	e.GET("/users/:id", users.GetUserById)

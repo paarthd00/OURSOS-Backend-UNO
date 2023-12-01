@@ -20,17 +20,18 @@ func UpdateUser(c echo.Context) error {
 	errEnc := json.NewDecoder(c.Request().Body).Decode(&json_map)
 	util.CheckError(errEnc)
 
+	deviceId := json_map["deviceId"]
 	username := json_map["username"]
 	lat := json_map["lat"]
 	long := json_map["long"]
 	languagepreference := json_map["languagepreference"]
 	friends := json_map["friends"].([]interface{})
 
-	stmt, err := dbConn.Prepare("UPDATE users SET username = $2, lat = $3, long=$4, languagepreference = $5, friends = $6 WHERE id = $1 ")
+	stmt, err := dbConn.Prepare("UPDATE users SET deviceId=$2, username = $3, lat = $4, long=$5, languagepreference = $6, friends = $7 WHERE id = $1 ")
 	util.CheckError(err)
 	defer stmt.Close()
 
-	_, err = stmt.Exec(id, username, lat, long, languagepreference.(string), pq.Array(friends))
+	_, err = stmt.Exec(id, deviceId, username, lat, long, languagepreference.(string), pq.Array(friends))
 	util.CheckError(err)
 
 	return c.JSON(200, map[string]string{"message": "User updated successfully"})
