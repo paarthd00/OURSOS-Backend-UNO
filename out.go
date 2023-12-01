@@ -13,6 +13,7 @@ import (
 	"oursos.com/packages/alerts"
 	"oursos.com/packages/api"
 	"oursos.com/packages/db"
+	image "oursos.com/packages/images"
 	"oursos.com/packages/users"
 	"oursos.com/packages/util"
 )
@@ -58,6 +59,8 @@ func main() {
 	e.GET("/news", api.GetNews)
 	e.GET("/languages", api.ListSupportedLanguages)
 	e.POST("/translateobject", api.TranslateObject)
+	e.POST("/uploadimage", image.UploadImage)
+	e.POST("/createuser", users.CreateUser)
 
 	e.Logger.Fatal(e.Start("0.0.0.0:" + os.Getenv("PORT")))
 }
