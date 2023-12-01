@@ -24,22 +24,20 @@ type Alert struct {
 func GetAllAlertsHandler(c echo.Context) error {
 	db, err := db.Connection()
 	util.CheckError(err)
+
+	// Check if the alerts table exists
+	tableCheck, err := db.Query("SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'alerts'")
+	util.CheckError(err)
+	if !tableCheck.Next() {
+		return c.JSON(http.StatusOK, make([]Alert, 0))
+	}
+
 	rows, err := db.Query("SELECT * FROM alerts")
 	util.CheckError(err)
 	defer rows.Close()
-	// client := redis.Client()
-	// ctx := context.Background()
 
-	// exists, err := client.Exists(ctx, "alerts").Result()
-	// util.CheckError(err)
 	var alerts []Alert
 
-	// if exists == 1 {
-	// alerts_json := client.Get(ctx, "alerts").Val()
-	// err = json.Unmarshal([]byte(alerts_json), &alerts)
-	// util.CheckError(err)
-	// println("redis")
-	// } else {
 	for rows.Next() {
 		var alert Alert
 		if err := rows.Scan(&alert.ID, &alert.Message, &alert.Type, &alert.Severity, &alert.Time, &alert.Lat, &alert.Long); err != nil {
@@ -47,11 +45,14 @@ func GetAllAlertsHandler(c echo.Context) error {
 		}
 		alerts = append(alerts, alert)
 	}
-	// alerts_json, err := json.Marshal(alerts)
-	util.CheckError(err)
-	// rediserr := client.Set(ctx, "alerts", alerts_json, 0).Err()
-	// util.CheckError(rediserr)
-	// }
+
+	if err = rows.Err(); err != nil {
+		util.CheckError(err)
+	}
+
+	if len(alerts) == 0 {
+		alerts = make([]Alert, 0)
+	}
 
 	return c.JSON(http.StatusOK, alerts)
 }
