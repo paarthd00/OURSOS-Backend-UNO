@@ -16,20 +16,20 @@ import (
 
 func GetUserById(c echo.Context) error {
 
-	id := c.Param("id")
+	deviceId := c.Param("deviceId")
 
 	db, err := db.Connection()
 	util.CheckError(err)
 	defer db.Close()
 
-	query := "SELECT * FROM users WHERE id = $1"
-	rows, err := db.Query(query, id)
+	query := "SELECT * FROM users WHERE deviceId = $1"
+	rows, err := db.Query(query, deviceId)
 
 	util.CheckError(err)
 	defer rows.Close()
 
 	if !rows.Next() {
-		util.CheckError(fmt.Errorf("no user with id %s", id))
+		util.CheckError(fmt.Errorf("no user with id %s", deviceId))
 	}
 
 	var user User
