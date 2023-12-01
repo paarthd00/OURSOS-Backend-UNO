@@ -22,7 +22,7 @@ func GetAlertById(c echo.Context) error {
 	rows, err := db.Query(query, id)
 	util.CheckError(err)
 	defer rows.Close()
-
+	defer db.Close()
 	if !rows.Next() {
 		util.CheckError(err)
 	}

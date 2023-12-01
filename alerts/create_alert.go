@@ -25,5 +25,8 @@ func ReportAlert(c echo.Context) error {
 	_, err = dbConn.Exec(insertAlertSQL, alert.Message, alert.Type, alert.Severity, alert.Lat, alert.Long)
 
 	util.CheckError(err)
+
+	defer dbConn.Close()
+
 	return c.JSON(200, map[string]string{"message": "Alert created successfully"})
 }
