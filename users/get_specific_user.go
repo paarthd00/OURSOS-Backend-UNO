@@ -1,6 +1,7 @@
 package users
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 
@@ -32,15 +33,18 @@ func GetUserById(c echo.Context) error {
 	}
 
 	var user User
-	var friendsStr string
+	var friendsStr sql.NullString // Use sql.NullString instead of string
 	errScan := rows.Scan(&user.ID, &user.DeviceId, &user.Username, &user.Lat, &user.Long, &user.LanguagePreference, &friendsStr, &user.Profile)
 	util.CheckError(errScan)
 
-	// Parse the "friends" array from the string to []int
-	user.Friends, err = parseIntArray(friendsStr)
-	if err != nil {
-		log.Fatal(err)
-		return c.String(http.StatusInternalServerError, "Database error")
+	// Check if friendsStr is valid (not NULL) before parsing
+	if friendsStr.Valid {
+		// Parse the "friends" array from the string to []int
+		user.Friends, err = parseIntArray(friendsStr.String)
+		if err != nil {
+			log.Fatal(err)
+			return c.String(http.StatusInternalServerError, "Database error")
+		}
 	}
 
 	util.CheckError(err)
