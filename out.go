@@ -61,6 +61,7 @@ func main() {
 	e.POST("/translateobject", api.TranslateObject)
 	e.POST("/uploadimage", image.UploadImage)
 	e.POST("/createuser", users.CreateUser)
+	e.GET("/getuserbyid/:id", users.GetUserByUserId)
 
 	e.Logger.Fatal(e.Start("0.0.0.0:" + os.Getenv("PORT")))
 }

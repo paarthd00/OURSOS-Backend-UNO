@@ -8,12 +8,12 @@ import (
 
 func SeedDatabase() {
 	db, err := Connection()
-	deviceId := "efe49b2f-4380-4c71-a969-d230f6c3199b"
-	username := "JohnDoe"
-	lat := 49.263570
-	long := -123.138570
+	deviceId := "ingrid"
+	username := "Jun"
+	lat := 37.938194
+	long := 126.587791
 	languagepreference := "en"
-	friends := []int{2, 3} // Sample user IDs as integers
+	friends := []int{1} // Sample user IDs as integers
 	profile := "https://picsum.photos/200/300?grayscale"
 	util.CheckError(err)
 
