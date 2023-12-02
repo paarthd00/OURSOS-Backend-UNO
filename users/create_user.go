@@ -25,13 +25,15 @@ func CreateUser(c echo.Context) error {
 	lat := json_map["lat"]
 	long := json_map["long"]
 	languagepreference := json_map["languagepreference"]
-	friends := json_map["friends"]
 	profile := json_map["profile"]
 
-	// Convert friends slice to []int
-	friendsArr := make([]int, len(friends.([]interface{})))
-	for i, v := range friends.([]interface{}) {
-		friendsArr[i] = int(v.(float64))
+	// Check if friends exists in json_map, if not, set to empty array
+	var friendsArr []int
+	if friends, ok := json_map["friends"]; ok {
+		friendsArr = make([]int, len(friends.([]interface{})))
+		for i, v := range friends.([]interface{}) {
+			friendsArr[i] = int(v.(float64))
+		}
 	}
 
 	// Create a prepared statement

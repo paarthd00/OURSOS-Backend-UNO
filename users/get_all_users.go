@@ -1,6 +1,7 @@
 package users
 
 import (
+	"database/sql"
 	"net/http"
 	"strconv"
 	"strings"
@@ -30,7 +31,7 @@ func GetAllUsersHandler(c echo.Context) error {
 	db, err := db.Connection()
 	util.CheckError(err)
 
-	rows, err := db.Query("SELECT id, deviceId, username, lat, long, languagepreference, friends, profile FROM users")
+	rows, err := db.Query("SELECT * FROM users")
 	if err != nil {
 		log.Fatal(err)
 		return c.String(http.StatusInternalServerError, "Database error")
@@ -41,7 +42,7 @@ func GetAllUsersHandler(c echo.Context) error {
 
 	for rows.Next() {
 		var user User
-		var friendsStr string // To hold the array as a string
+		var friendsStr sql.NullString // To hold the array as a string
 		err := rows.Scan(&user.ID, &user.DeviceId, &user.Username, &user.Lat, &user.Long, &user.LanguagePreference, &friendsStr, &user.Profile)
 		if err != nil {
 			log.Fatal(err)
@@ -49,10 +50,12 @@ func GetAllUsersHandler(c echo.Context) error {
 		}
 
 		// Parse the "friends" array from the string to []int
-		user.Friends, err = parseIntArray(friendsStr)
-		if err != nil {
-			log.Fatal(err)
-			return c.String(http.StatusInternalServerError, "Database error")
+		if friendsStr.Valid {
+			user.Friends, err = parseIntArray(friendsStr.String)
+			if err != nil {
+				log.Fatal(err)
+				return c.String(http.StatusInternalServerError, "Database error")
+			}
 		}
 
 		users = append(users, user)

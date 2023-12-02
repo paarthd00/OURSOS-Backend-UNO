@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/lib/pq"
 	"oursos.com/packages/db"
 	"oursos.com/packages/util"
 )
@@ -39,20 +40,32 @@ func GetFriendsForUsers(c echo.Context) error {
 	}
 	util.CheckError(err)
 
-	// Query each friend ID and append to a new slice
+	user.Friends = friendIDs // Assign the parsed friend IDs to the 'Friends' field of the user
+
+	// Query all friends at once
+	friendsQuery := "SELECT * FROM users WHERE id = ANY($1)"
+	friendsRows, err := db.Query(friendsQuery, pq.Array(friendIDs))
+	util.CheckError(err)
+	defer friendsRows.Close()
+
+	// Scan each friend and append to a new slice
 	var friends []User
-	for _, friendID := range friendIDs {
-		friendQuery := "SELECT * FROM users WHERE id = $1"
-		friendRows, err := db.Query(friendQuery, friendID)
+	for friendsRows.Next() {
+		var friend User
+		var friendFriendsStr string
+		errScan := friendsRows.Scan(&friend.ID, &friend.DeviceId, &friend.Username, &friend.Lat, &friend.Long, &friend.LanguagePreference, &friendFriendsStr, &friend.Profile)
+		util.CheckError(errScan)
+
+		// Parse the "friends" array from the string to []int for each friend
+		friendFriendIDs, err := parseIntArray(friendFriendsStr)
+		if err != nil {
+			log.Fatal(err)
+			return c.String(http.StatusInternalServerError, "Database error")
+		}
 		util.CheckError(err)
 
-		if friendRows.Next() {
-			var friend User
-			errScan := friendRows.Scan(&friend.ID, &friend.DeviceId, &friend.Username, &friend.Lat, &friend.Long, &friend.LanguagePreference, &friendsStr, &friend.Profile)
-			util.CheckError(errScan)
-			friends = append(friends, friend)
-		}
-		friendRows.Close()
+		friend.Friends = friendFriendIDs // Assign the parsed friend IDs to the 'Friends' field of each friend
+		friends = append(friends, friend)
 	}
 
 	return c.JSON(http.StatusOK, friends)

@@ -2,6 +2,7 @@ package users
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/lib/pq"
@@ -10,7 +11,6 @@ import (
 )
 
 func UpdateUser(c echo.Context) error {
-
 	dbConn, err := db.Connection()
 	util.CheckError(err)
 	defer dbConn.Close()
@@ -20,18 +20,33 @@ func UpdateUser(c echo.Context) error {
 	errEnc := json.NewDecoder(c.Request().Body).Decode(&json_map)
 	util.CheckError(errEnc)
 
-	deviceId := json_map["deviceId"]
-	username := json_map["username"]
-	lat := json_map["lat"]
-	long := json_map["long"]
-	languagepreference := json_map["languagepreference"]
-	friends := json_map["friends"].([]interface{})
-	profile := json_map["profile"]
-	stmt, err := dbConn.Prepare("UPDATE users SET deviceId=$2, username = $3, lat = $4, long=$5, languagepreference = $6, friends = $7, profile=$8 WHERE id = $1 ")
+	// Start constructing the SQL query
+	query := "UPDATE users SET "
+	args := []interface{}{}
+	i := 2
+
+	// Iterate over the map and add each field to the query
+	for field, value := range json_map {
+		if field != "id" { // Exclude the 'id' field
+			query += field + " = $" + strconv.Itoa(i) + ", "
+			if field == "friends" {
+				args = append(args, pq.Array(value.([]interface{})))
+			} else {
+				args = append(args, value)
+			}
+			i++
+		}
+	}
+
+	// Remove the trailing comma and space, add the WHERE clause
+	query = query[:len(query)-2] + " WHERE id = $1"
+	args = append([]interface{}{id}, args...)
+
+	stmt, err := dbConn.Prepare(query)
 	util.CheckError(err)
 	defer stmt.Close()
 
-	_, err = stmt.Exec(id, deviceId, username, lat, long, languagepreference.(string), pq.Array(friends), profile.(string))
+	_, err = stmt.Exec(args...)
 	util.CheckError(err)
 
 	return c.JSON(200, map[string]string{"message": "User updated successfully"})
