@@ -1,7 +1,6 @@
 package users
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -29,7 +28,7 @@ func GetUserByUserId(c echo.Context) error {
 	defer rows.Close()
 
 	if !rows.Next() {
-		util.CheckError(fmt.Errorf("no user with id %s", id))
+		return c.JSON(http.StatusOK, nil)
 	}
 
 	var user User

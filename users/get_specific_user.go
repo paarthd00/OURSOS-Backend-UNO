@@ -1,7 +1,6 @@
 package users
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -29,7 +28,7 @@ func GetUserById(c echo.Context) error {
 	defer rows.Close()
 
 	if !rows.Next() {
-		util.CheckError(fmt.Errorf("no user with id %s", deviceId))
+		return c.JSON(http.StatusOK, nil)
 	}
 
 	var user User
@@ -43,6 +42,7 @@ func GetUserById(c echo.Context) error {
 		log.Fatal(err)
 		return c.String(http.StatusInternalServerError, "Database error")
 	}
+
 	util.CheckError(err)
 
 	return c.JSON(http.StatusOK, user)
