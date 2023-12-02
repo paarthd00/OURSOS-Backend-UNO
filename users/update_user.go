@@ -2,6 +2,7 @@ package users
 
 import (
 	"encoding/json"
+	"net/http"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -19,6 +20,19 @@ func UpdateUser(c echo.Context) error {
 	json_map := make(map[string]interface{})
 	errEnc := json.NewDecoder(c.Request().Body).Decode(&json_map)
 	util.CheckError(errEnc)
+
+	// Check if a user with the same username already exists
+	if username, ok := json_map["username"]; ok {
+		userExistsQuery := "SELECT EXISTS(SELECT 1 FROM users WHERE username=$1 AND id<>$2)"
+		row := dbConn.QueryRow(userExistsQuery, username, id)
+		var exists bool
+		err = row.Scan(&exists)
+		util.CheckError(err)
+
+		if exists {
+			return c.JSON(http.StatusConflict, map[string]string{"message": "Username already exists"})
+		}
+	}
 
 	// Start constructing the SQL query
 	query := "UPDATE users SET "
