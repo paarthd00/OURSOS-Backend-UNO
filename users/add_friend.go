@@ -32,6 +32,12 @@ func AddFriend(c echo.Context) error {
 	user2, err := getUserById(db, id2)
 	util.CheckError(err)
 
+	// Check if they are already friends
+	if areFriends(user1.Friends, id2) || areFriends(user2.Friends, id1) {
+		// Return a response indicating they are already friends
+		return c.JSON(http.StatusOK, map[string]string{"message": "Users are already friends"})
+	}
+
 	// Add each user to the other's friends array
 	user1.Friends = append(user1.Friends, id2)
 	user2.Friends = append(user2.Friends, id1)
@@ -45,6 +51,16 @@ func AddFriend(c echo.Context) error {
 
 	// Return a success response
 	return c.JSON(http.StatusOK, map[string]string{"message": "Successfully added friend"})
+}
+
+// Function to check if user is already in the friends list
+func areFriends(friends []int, userID int) bool {
+	for _, friendID := range friends {
+		if friendID == userID {
+			return true
+		}
+	}
+	return false
 }
 
 // You'll need to implement these functions to fetch and update users in the database
