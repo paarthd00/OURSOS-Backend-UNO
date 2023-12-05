@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
 
 	"cloud.google.com/go/translate"
 	"github.com/joho/godotenv"
@@ -71,25 +72,31 @@ func GetNews(c echo.Context) error {
 		println("redis")
 	} else {
 		if lang != "en" {
+			var wg sync.WaitGroup
 			for _, article := range news_results {
-				articleMap := article.(map[string]interface{})
-				title := articleMap["title"].(string)
-				snippet := articleMap["snippet"].(string)
+				wg.Add(1)
+				go func(article interface{}) {
+					defer wg.Done()
+					articleMap := article.(map[string]interface{})
+					title := articleMap["title"].(string)
+					snippet := articleMap["snippet"].(string)
 
-				// Translate title
-				titleTranslation, err := client.Translate(ctx, []string{title}, language.Make(lang), nil)
-				if err != nil {
-					log.Fatalf("Failed to translate text: %v", err)
-				}
-				articleMap["title"] = titleTranslation[0].Text
+					// Translate title
+					titleTranslation, err := client.Translate(ctx, []string{title}, language.Make(lang), nil)
+					if err != nil {
+						log.Fatalf("Failed to translate text: %v", err)
+					}
+					articleMap["title"] = titleTranslation[0].Text
 
-				// Translate snippet
-				snippetTranslation, err := client.Translate(ctx, []string{snippet}, language.Make(lang), nil)
-				if err != nil {
-					log.Fatalf("Failed to translate text: %v", err)
-				}
-				articleMap["snippet"] = snippetTranslation[0].Text
+					// Translate snippet
+					snippetTranslation, err := client.Translate(ctx, []string{snippet}, language.Make(lang), nil)
+					if err != nil {
+						log.Fatalf("Failed to translate text: %v", err)
+					}
+					articleMap["snippet"] = snippetTranslation[0].Text
+				}(article)
 			}
+			wg.Wait()
 		}
 		news_results_json, err := json.Marshal(news_results)
 		util.CheckError(err)
