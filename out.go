@@ -23,7 +23,6 @@ func homeHandler(c echo.Context) error {
 }
 
 func main() {
-
 	err := godotenv.Load()
 	util.CheckError(err)
 	dbConn, err := db.Connection()
@@ -56,7 +55,7 @@ func main() {
 	e.GET("/earthquakes", api.GetEarthQuakes)
 	e.POST("/translate", api.Translate)
 	e.POST("/chat", api.ChatHandler)
-	e.GET("/news", api.GetNews)
+	e.POST("/news/:lang", api.GetNews)
 	e.GET("/languages", api.ListSupportedLanguages)
 	e.POST("/translateobject/:lang", api.TranslateObject)
 	e.POST("/uploadimage", image.UploadImage)
