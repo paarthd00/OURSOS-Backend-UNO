@@ -58,9 +58,18 @@ var staticJSON = map[string]interface{}{
 		"description":   "Description",
 	},
 	"settings": map[string]interface{}{
-		"changelanguage": "Change Language",
+		"selectlanguage": "Select Your Language",
 		"updateprofile":  "Update Profile",
 		"addfriend":      "Add Friend",
+		"updateimage":    "Update Image",
+		"username":       "Username",
+		"done":           "Done",
+		"continue":       "Continue",
+		"cancel":         "Cancel",
+		"burnaby":        "Burnaby",
+		"addFriend":      "Add Friend",
+		"date":           "Date",
+		"size":           "Size",
 	},
 }
 
