@@ -16,6 +16,13 @@ import (
 )
 
 var staticJSON = map[string]interface{}{
+	"intro": map[string]interface{}{
+		"newsfeed":            "News Feed",
+		"newsfeedtext":        "Staying informed goes beyond crisis alerts. That's why we've included a local news dashboard for your saved locales. OurSOS keeps you up-to-date with relevant news and developments, helping you navigate through any situation effectively.",
+		"intro-map-text":      "Visualizing crisis information is crucial. OurSOS offers an interactive map view that displays crises and dangers in your area. This user-friendly interface helps you understand the proximity of threats and aids in making quick and informed decisions.",
+		"friends-family":      "Friends/Family",
+		"friends-family-text": "We recognize that your circle of loved ones extends far and wide, beyond just your immediate location. With approximate location data, we can provide you with information about the safety of your family and friends around the world.",
+	},
 	"dashboard": map[string]interface{}{
 		"news":      "News",
 		"map":       "Map",
