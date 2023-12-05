@@ -33,15 +33,15 @@ func main() {
 		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	}))
-
 	c := cron.New()
-	c.AddFunc("@every 1m", func() {
-		cleanAlertSQL := `DELETE FROM alerts WHERE time <= NOW() - INTERVAL '1 minute';`
+	c.AddFunc("@every 10m", func() {
+		cleanAlertSQL := `DELETE FROM alerts WHERE time <= NOW() - INTERVAL '10 minute';`
 		_, err = dbConn.Exec(cleanAlertSQL)
 		util.CheckError(err)
 	})
 
 	c.Start()
+
 	// db.SeedDatabase()
 	e.GET("/", homeHandler)
 	e.GET("/users", users.GetAllUsersHandler)
