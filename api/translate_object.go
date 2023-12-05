@@ -15,6 +15,48 @@ import (
 	"oursos.com/packages/util"
 )
 
+var staticJSON = map[string]interface{}{
+	"dashboard": map[string]interface{}{
+		"news":      "News",
+		"map":       "Map",
+		"getAIHelp": "Get AI Help",
+	},
+	"map": map[string]interface{}{
+		"standard":    "Standard",
+		"report":      "Report",
+		"shrink":      "Shrink",
+		"list":        "List",
+		"all":         "All",
+		"hazards":     "Hazards",
+		"fires":       "Fires",
+		"police":      "Police",
+		"earthquakes": "EarthQuakes",
+		"tsunamis":    "Tsunamis",
+		"wildfires":   "Wild Fires",
+		"show":        "Show",
+		"hybrid":      "Hybrid",
+		"default":     "Default",
+	},
+	"menu": map[string]interface{}{
+		"home":     "Home",
+		"settings": "Settings",
+	},
+	"modal": map[string]interface{}{
+		"page":          "Page",
+		"whatdidyousee": "What did you see",
+		"severity":      "Severity",
+		"tellusmore":    "Tell Us More",
+		"whathappened":  "What Happened",
+		"next":          "Next",
+		"description":   "Description",
+	},
+	"settings": map[string]interface{}{
+		"changelanguage": "Change Language",
+		"updateprofile":  "Update Profile",
+		"addfriend":      "Add Friend",
+	},
+}
+
 func TranslateObject(c echo.Context) error {
 
 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "./translate.json")
@@ -26,29 +68,22 @@ func TranslateObject(c echo.Context) error {
 
 	defer client.Close()
 
-	json_map := make(map[string]interface{})
-
-	errEnc := json.NewDecoder(c.Request().Body).Decode(&json_map)
-	util.CheckError(errEnc)
-
-	inputObject := json_map["translateObject"].(map[string]interface{})
-	lang := json_map["lang"].(string)
-	targetLang := language.MustParse(lang).String()
+	lang := c.Param("lang")
 
 	redis_client := redis.Client()
 	redis_ctx := context.Background()
 
-	exists, err := redis_client.Exists(redis_ctx, "translateobject_"+targetLang).Result()
+	exists, err := redis_client.Exists(redis_ctx, "translateobject_"+lang).Result()
 	util.CheckError(err)
 	if exists == 1 {
-		translate_obj_json := redis_client.Get(redis_ctx, "translateobject_"+targetLang).Val()
-		err = json.Unmarshal([]byte(translate_obj_json), &inputObject)
+		translate_obj_json := redis_client.Get(redis_ctx, "translateobject_"+lang).Val()
+		err = json.Unmarshal([]byte(translate_obj_json), &staticJSON)
 		util.CheckError(err)
 		println("redis")
 	} else {
 		var wg sync.WaitGroup // WaitGroup to synchronize goroutines
 		var mutex sync.Mutex
-		for key, value := range inputObject {
+		for key, value := range staticJSON {
 			if subMap, ok := value.(map[string]interface{}); ok {
 				wg.Add(1)
 				go func(subMap map[string]interface{}, key string) {
@@ -56,33 +91,23 @@ func TranslateObject(c echo.Context) error {
 					mutex.Lock()
 					newSubMap := make(map[string]interface{})
 					for subKey, subValue := range subMap {
-						resp, err := client.Translate(ctx, []string{subValue.(string)}, language.Make(targetLang), nil)
+						resp, err := client.Translate(ctx, []string{subValue.(string)}, language.Make(lang), nil)
 						util.CheckError(err)
 						translatedText := resp[0].Text
 						newSubMap[subKey] = translatedText
 					}
-					inputObject[key] = newSubMap
+					staticJSON[key] = newSubMap
 					mutex.Unlock()
 				}(subMap, key)
 			}
 		}
 		wg.Wait()
 
-		translate_obj_json, err := json.Marshal(inputObject)
+		translate_obj_json, err := json.Marshal(staticJSON)
 		util.CheckError(err)
-		rediserr := redis_client.Set(redis_ctx, "translateobject_"+targetLang, translate_obj_json, 0).Err()
+		rediserr := redis_client.Set(redis_ctx, "translateobject_"+lang, translate_obj_json, 0).Err()
 		util.CheckError(rediserr)
 	}
 
-	return c.JSON(200, inputObject)
+	return c.JSON(200, staticJSON)
 }
-
-// func changeValueForKey(data map[string]interface{}, keyToChange, newValue string) {
-// 	for key, value := range data {
-// 		if subMap, ok := value.(map[string]interface{}); ok {
-// 			changeValueForKey(subMap, keyToChange, newValue)
-// 		} else if key == keyToChange {
-// 			data[key] = newValue
-// 		}
-// 	}
-// }

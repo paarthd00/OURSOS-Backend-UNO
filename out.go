@@ -58,7 +58,7 @@ func main() {
 	e.POST("/chat", api.ChatHandler)
 	e.GET("/news", api.GetNews)
 	e.GET("/languages", api.ListSupportedLanguages)
-	e.POST("/translateobject", api.TranslateObject)
+	e.POST("/translateobject/:lang", api.TranslateObject)
 	e.POST("/uploadimage", image.UploadImage)
 	e.POST("/createuser", users.CreateUser)
 	e.GET("/getuserbyid/:id", users.GetUserByUserId)
