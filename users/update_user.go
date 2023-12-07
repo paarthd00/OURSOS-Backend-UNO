@@ -17,12 +17,12 @@ func UpdateUser(c echo.Context) error {
 	defer dbConn.Close()
 
 	id := c.Param("id")
-	json_map := make(map[string]interface{})
-	errEnc := json.NewDecoder(c.Request().Body).Decode(&json_map)
+	jsonMap := make(map[string]interface{})
+	errEnc := json.NewDecoder(c.Request().Body).Decode(&jsonMap)
 	util.CheckError(errEnc)
 
 	// Check if a user with the same username already exists
-	if username, ok := json_map["username"]; ok {
+	if username, ok := jsonMap["username"]; ok {
 		userExistsQuery := "SELECT EXISTS(SELECT 1 FROM users WHERE username=$1 AND id<>$2)"
 		row := dbConn.QueryRow(userExistsQuery, username, id)
 		var exists bool
@@ -40,11 +40,15 @@ func UpdateUser(c echo.Context) error {
 	i := 2
 
 	// Iterate over the map and add each field to the query
-	for field, value := range json_map {
+	for field, value := range jsonMap {
 		if field != "id" { // Exclude the 'id' field
 			query += field + " = $" + strconv.Itoa(i) + ", "
 			if field == "friends" {
-				args = append(args, pq.Array(value.([]interface{})))
+				if value == nil {
+					args = append(args, nil) // Set friends to NULL
+				} else {
+					args = append(args, pq.Array(value.([]interface{})))
+				}
 			} else {
 				args = append(args, value)
 			}
