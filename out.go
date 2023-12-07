@@ -63,5 +63,6 @@ func main() {
 	e.GET("/getuserbyid/:id", users.GetUserByUserId)
 	e.GET("/getfriendsforuser/:id", users.GetFriendsForUsers)
 	e.POST("/addfriend/:id1/:id2", users.AddFriend)
+	e.POST("/removefriend/:id1/:id2", users.RemoveFriend)
 	e.Logger.Fatal(e.Start("0.0.0.0:" + os.Getenv("PORT")))
 }
