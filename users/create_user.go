@@ -16,11 +16,11 @@ func CreateUser(c echo.Context) error {
 	util.CheckError(err)
 	defer dbConn.Close()
 
-	json_map := make(map[string]interface{})
-	errEnc := json.NewDecoder(c.Request().Body).Decode(&json_map)
+	jsonMap := make(map[string]interface{})
+	errEnc := json.NewDecoder(c.Request().Body).Decode(&jsonMap)
 	util.CheckError(errEnc)
 
-	username := json_map["username"].(string)
+	username := jsonMap["username"].(string)
 
 	// Check if a user with the same username already exists
 	userExistsQuery := "SELECT EXISTS(SELECT 1 FROM users WHERE username=$1)"
@@ -33,15 +33,15 @@ func CreateUser(c echo.Context) error {
 		return c.JSON(http.StatusConflict, map[string]string{"message": "Username already exists"})
 	}
 
-	deviceId := json_map["deviceId"].(string)
-	lat := json_map["lat"].(float64)
-	long := json_map["long"].(float64)
-	languagepreference := json_map["languagepreference"].(string)
-	profile := json_map["profile"].(string)
+	deviceID := jsonMap["deviceId"].(string)
+	lat := jsonMap["lat"].(float64)
+	long := jsonMap["long"].(float64)
+	languagePreference := jsonMap["languagepreference"].(string)
+	profile := jsonMap["profile"].(string)
 
-	// Check if friends exists in json_map, if not, set to empty array
+	// Check if friends exist in jsonMap, if not, set to empty array
 	var friendsArr []int
-	if friends, ok := json_map["friends"]; ok {
+	if friends, ok := jsonMap["friends"]; ok {
 		friendsArr = make([]int, len(friends.([]interface{})))
 		for i, v := range friends.([]interface{}) {
 			friendsArr[i] = int(v.(float64))
@@ -49,12 +49,24 @@ func CreateUser(c echo.Context) error {
 	}
 
 	// Create a prepared statement
-	stmt, err := dbConn.Prepare("INSERT INTO users (deviceId, username, lat, long, languagepreference, friends, profile) VALUES ($1, $2, $3, $4, $5, $6, $7)")
+	stmt, err := dbConn.Prepare("INSERT INTO users (deviceId, username, lat, long, languagepreference, friends, profile) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id")
 	util.CheckError(err)
 	defer stmt.Close()
 
-	_, err = stmt.Exec(deviceId, username, lat, long, languagepreference, pq.Array(friendsArr), profile)
+	var userID int
+	err = stmt.QueryRow(deviceID, username, lat, long, languagePreference, pq.Array(friendsArr), profile).Scan(&userID)
 	util.CheckError(err)
 
-	return c.JSON(http.StatusOK, map[string]string{"message": "User created successfully"})
+	createdUser := User{
+		ID:                 userID,
+		DeviceId:           deviceID,
+		Username:           username,
+		Lat:                lat,
+		Long:               long,
+		LanguagePreference: languagePreference,
+		Friends:            friendsArr,
+		Profile:            profile,
+	}
+
+	return c.JSON(http.StatusOK, createdUser)
 }
